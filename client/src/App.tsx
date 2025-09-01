@@ -25,14 +25,14 @@ function App() {
     }
   }
 
-  const addTodo = async (text: string) => {
+  const addTodo = async (todoData: { title: string; description?: string; dueDate: string }) => {
     try {
       const response = await fetch('/api/todos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify(todoData),
       })
       if (response.ok) {
         const newTodo = await response.json()
