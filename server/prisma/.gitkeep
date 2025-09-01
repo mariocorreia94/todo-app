@@ -1,0 +1,2 @@
+# This file ensures the prisma directory is tracked in git
+# It will be removed once the schema.prisma file is added
