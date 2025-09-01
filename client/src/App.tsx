@@ -71,6 +71,26 @@ function App() {
     }
   }
 
+  const updateTodo = async (id: number, updatedData: { title?: string; description?: string; dueDate?: string }) => {
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      })
+      if (response.ok) {
+        const updatedTodo = await response.json()
+        setTodos(todos.map(todo =>
+          todo.id === id ? { ...todo, ...updatedTodo } : todo
+        ))
+      }
+    } catch (error) {
+      console.error('Error updating todo:', error)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -90,6 +110,7 @@ function App() {
           todos={todos}
           onToggle={toggleTodo}
           onDelete={deleteTodo}
+          onUpdate={updateTodo}
         />
       </div>
     </div>
