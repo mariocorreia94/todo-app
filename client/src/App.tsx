@@ -1,118 +1,17 @@
-import { useState, useEffect } from 'react'
-import TodoList from './components/TodoList'
-import TodoForm from './components/TodoForm'
-import { Todo } from './types/todo'
+import { Routes, Route } from 'react-router-dom'
+import HomePage from './components/HomePage'
+import TodoFilterPage from './components/TodoFilterPage'
+import NotFoundPage from './components/NotFoundPage'
 
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchTodos()
-  }, [])
-
-  const fetchTodos = async () => {
-    try {
-      const response = await fetch('/api/todos')
-      if (response.ok) {
-        const data = await response.json()
-        setTodos(data)
-      }
-    } catch (error) {
-      console.error('Error fetching todos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const addTodo = async (todoData: { title: string; description?: string; dueDate: string }) => {
-    try {
-      const response = await fetch('/api/todos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(todoData),
-      })
-      if (response.ok) {
-        const newTodo = await response.json()
-        setTodos([...todos, newTodo])
-      }
-    } catch (error) {
-      console.error('Error adding todo:', error)
-    }
-  }
-
-  const toggleTodo = async (id: number) => {
-    try {
-      const response = await fetch(`/api/todos/${id}/toggle`, {
-        method: 'PATCH',
-      })
-      if (response.ok) {
-        setTodos(todos.map(todo =>
-          todo.id === id ? { ...todo, completed: !todo.completed } : todo
-        ))
-      }
-    } catch (error) {
-      console.error('Error toggling todo:', error)
-    }
-  }
-
-  const deleteTodo = async (id: number) => {
-    try {
-      const response = await fetch(`/api/todos/${id}`, {
-        method: 'DELETE',
-      })
-      if (response.ok) {
-        setTodos(todos.filter(todo => todo.id !== id))
-      }
-    } catch (error) {
-      console.error('Error deleting todo:', error)
-    }
-  }
-
-  const updateTodo = async (id: number, updatedData: { title?: string; description?: string; dueDate?: string }) => {
-    try {
-      const response = await fetch(`/api/todos/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedData),
-      })
-      if (response.ok) {
-        const updatedTodo = await response.json()
-        setTodos(todos.map(todo =>
-          todo.id === id ? { ...todo, ...updatedTodo } : todo
-        ))
-      }
-    } catch (error) {
-      console.error('Error updating todo:', error)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading...</div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Todo App
-        </h1>
-        <TodoForm onAdd={addTodo} />
-        <TodoList
-          todos={todos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
-          onUpdate={updateTodo}
-        />
-      </div>
+    <div className="min-h-screen bg-gray-100">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/overdue" element={<TodoFilterPage filterType="overdue" />} />
+        <Route path="/today" element={<TodoFilterPage filterType="today" />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </div>
   )
 }
